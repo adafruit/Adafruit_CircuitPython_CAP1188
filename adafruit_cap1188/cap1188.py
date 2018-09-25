@@ -96,8 +96,8 @@ class CAP1188:
     """CAP1188 driver base, must be extended for I2C/SPI interfacing."""
     def __init__(self):
         self._channels = [None]*8
-        self._write_register(CAP1188_LED_LINKING, 0xFF)      # turn on LED linking
-        self._write_register(CAP1188_MULTI_TOUCH_CFG, 0x00)  # allow multi touch
+        self._write_register(CAP1188_LED_LINKING, 0xFF)     # turn on LED linking
+        self._write_register(CAP1188_MULTI_TOUCH_CFG, 0x00) # allow multi touch
         self.recalibrate()
 
     def __getitem__(self, key):
