@@ -20,10 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-`Adafruit_CAP1188`
+`adafruit_cap1188.i2c`
 ====================================================
 
-.. todo:: Describe what the module does
+CircuitPython I2C driver for the CAP1188 8-Key Capacitive Touch Sensor Breakout. 
 
 * Author(s): Carter Nelson
 
@@ -32,21 +32,45 @@ Implementation Notes
 
 **Hardware:**
 
-.. todo:: Add links to any specific hardware product page(s), or category page(s). Use unordered list & hyperlink rST
-   inline format: "* `Link Text <url>`_"
+* `CAP1188 - 8-Key Capacitive Touch Sensor Breakout <https://www.adafruit.com/product/1602>`_
 
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
   https://github.com/adafruit/circuitpython/releases
   
-.. todo:: Uncomment or remove the Bus Device and/or the Register library dependencies based on the library's use of either.
-
-# * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
-# * Adafruit's Register library: https://github.com/adafruit/Adafruit_CircuitPython_Register
+* Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 """
 
-# imports
+import adafruit_bus_device.i2c_device as i2c_device
+from micropython import const
+from adafruit_cap1188.cap1188 import CAP1188
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
+
+# pylint: disable=bad-whitespace
+CAP1188_DEFAULT_ADDRESS     = const(0x29)
+# pylint: enable=bad-whitespace
+
+class CAP1188_I2C(CAP1188):
+    """Driver for the CAP1188 connected over I2C."""
+    def __init__(self, i2c, address=CAP1188_DEFAULT_ADDRESS):
+        self._i2c = i2c_device.I2CDevice(i2c, CAP1188_DEFAULT_ADDRESS)
+        self._buf = bytearray(2)
+        super().__init__()
+
+    def _read_register(self, reg):
+        """Return 8 bit value of register at address."""
+        self._buf[0] = reg
+        with self._i2c as i2c:
+            i2c.write(self._buf, end=1, stop=False)
+            i2c.readinto(self._buf, start=1)
+        return self._buf[1]
+
+    def _write_register(self, reg, value):
+        """Write 8 bit value to registter at address."""
+        self._buf[0] = reg
+        self._buf[1] = value
+        with self._i2c as i2c:
+            i2c.write(self._buf)

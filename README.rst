@@ -13,7 +13,7 @@ Introduction
     :target: https://travis-ci.org/adafruit/Adafruit_CircuitPython_CAP1188
     :alt: Build Status
 
-.. todo:: Describe what the library does.
+CircuitPython driver for the CAP1188 8-Key Capacitive Touch Sensor Breakout. 
 
 Dependencies
 =============
@@ -21,7 +21,6 @@ This driver depends on:
 
 * `Adafruit CircuitPython <https://github.com/adafruit/circuitpython>`_
 * `Bus Device <https://github.com/adafruit/Adafruit_CircuitPython_BusDevice>`_
-* `Register <https://github.com/adafruit/Adafruit_CircuitPython_Register>`_
 
 Please ensure all dependencies are available on the CircuitPython filesystem.
 This is easily achieved by downloading
@@ -30,7 +29,7 @@ This is easily achieved by downloading
 Usage Example
 =============
 
-.. todo:: Add a quick, simple example. It and other examples should live in the examples folder and be included in docs/examples.rst.
+See usage examples in the examples folder.
 
 Contributing
 ============
