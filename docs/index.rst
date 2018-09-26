@@ -23,14 +23,12 @@ Table of Contents
 .. toctree::
     :caption: Tutorials
 
-.. todo:: Add any Learn guide links here. If there are none, then simply delete this todo and leave
-    the toctree above for use later.
+    Adafruit CAP1188 Breakout <https://learn.adafruit.com/adafruit-cap1188-breakout>
 
 .. toctree::
     :caption: Related Products
 
-.. todo:: Add any product links here. If there are none, then simply delete this todo and leave
-    the toctree above for use later.
+    Adafruit 8-Key Capacitive Touch Sensor Breakout - CAP1188 <https://www.adafruit.com/product/1602>
 
 .. toctree::
     :caption: Other Links
