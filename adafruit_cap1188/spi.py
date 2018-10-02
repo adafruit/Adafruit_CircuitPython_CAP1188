@@ -23,7 +23,7 @@
 `adafruit_cap1188.spi`
 ====================================================
 
-CircuitPython SPI driver for the CAP1188 8-Key Capacitive Touch Sensor Breakout. 
+CircuitPython SPI driver for the CAP1188 8-Key Capacitive Touch Sensor Breakout.
 
 * Author(s): Carter Nelson
 
@@ -38,7 +38,7 @@ Implementation Notes
 
 * Adafruit CircuitPython firmware for the supported boards:
   https://github.com/adafruit/circuitpython/releases
-  
+
 * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 """
 
@@ -62,19 +62,19 @@ class CAP1188_SPI(CAP1188):
         self._buf = bytearray(4)
         super().__init__()
 
-    def _read_register(self, reg):
+    def _read_register(self, address):
         """Return 8 bit value of register at address."""
         self._buf[0] = CAP1188_SPI_SET_ADDR
-        self._buf[1] = reg
+        self._buf[1] = address
         self._buf[2] = CAP1188_SPI_READ_DATA
         with self._spi as spi:
             spi.write_readinto(self._buf, self._buf)
         return self._buf[3]
 
-    def _write_register(self, reg, value):
+    def _write_register(self, address, value):
         """Write 8 bit value to registter at address."""
         self._buf[0] = CAP1188_SPI_SET_ADDR
-        self._buf[1] = reg
+        self._buf[1] = address
         self._buf[2] = CAP1188_SPI_WRITE_DATA
         self._buf[3] = value
         with self._spi as spi:

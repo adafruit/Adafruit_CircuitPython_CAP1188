@@ -23,7 +23,7 @@
 `adafruit_cap1188.i2c`
 ====================================================
 
-CircuitPython I2C driver for the CAP1188 8-Key Capacitive Touch Sensor Breakout. 
+CircuitPython I2C driver for the CAP1188 8-Key Capacitive Touch Sensor Breakout.
 
 * Author(s): Carter Nelson
 
@@ -38,7 +38,7 @@ Implementation Notes
 
 * Adafruit CircuitPython firmware for the supported boards:
   https://github.com/adafruit/circuitpython/releases
-  
+
 * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 """
 
@@ -56,21 +56,21 @@ CAP1188_DEFAULT_ADDRESS     = const(0x29)
 class CAP1188_I2C(CAP1188):
     """Driver for the CAP1188 connected over I2C."""
     def __init__(self, i2c, address=CAP1188_DEFAULT_ADDRESS):
-        self._i2c = i2c_device.I2CDevice(i2c, CAP1188_DEFAULT_ADDRESS)
+        self._i2c = i2c_device.I2CDevice(i2c, address)
         self._buf = bytearray(2)
         super().__init__()
 
-    def _read_register(self, reg):
+    def _read_register(self, address):
         """Return 8 bit value of register at address."""
-        self._buf[0] = reg
+        self._buf[0] = address
         with self._i2c as i2c:
             i2c.write(self._buf, end=1, stop=False)
             i2c.readinto(self._buf, start=1)
         return self._buf[1]
 
-    def _write_register(self, reg, value):
+    def _write_register(self, address, value):
         """Write 8 bit value to registter at address."""
-        self._buf[0] = reg
+        self._buf[0] = address
         self._buf[1] = value
         with self._i2c as i2c:
             i2c.write(self._buf)

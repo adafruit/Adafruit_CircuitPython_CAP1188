@@ -23,7 +23,7 @@
 `adafruit_cap1188.cap1188`
 ====================================================
 
-CircuitPython driver for the CAP1188 8-Key Capacitive Touch Sensor Breakout. 
+CircuitPython driver for the CAP1188 8-Key Capacitive Touch Sensor Breakout.
 
 * Author(s): Carter Nelson
 
@@ -38,7 +38,7 @@ Implementation Notes
 
 * Adafruit CircuitPython firmware for the supported boards:
   https://github.com/adafruit/circuitpython/releases
-  
+
 * Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 """
 
@@ -81,16 +81,16 @@ class CAP1188_Channel:
     def value(self):
         """Whether the pin is being touched or not."""
         return self._cap1188.touched() & (1 << self._pin - 1) != 0
-        
+
     @property
     def raw_value(self):
         """The raw touch measurement."""
-        return self._cap1188._delta_count(self._pin)
+        return self._cap1188.delta_count(self._pin)
 
     def recalibrate(self):
         """Perform a self recalibration."""
-        self._cap1188._recalibrate_pins(1 << self._pin - 1)
-            
+        self._cap1188.recalibrate_pins(1 << self._pin - 1)
+
 
 class CAP1188:
     """CAP1188 driver base, must be extended for I2C/SPI interfacing."""
@@ -101,7 +101,7 @@ class CAP1188:
         self.recalibrate()
 
     def __getitem__(self, key):
-        pin = key 
+        pin = key
         index = key - 1
         if pin < 1 or pin > 8:
             raise IndexError('Pin must be a value 1-8.')
@@ -128,7 +128,7 @@ class CAP1188:
     def touched_pins(self):
         """A tuple of touched state for all pins."""
         touched = self.touched()
-        return tuple([bool(touched >> i & 0x01) for i in range(8)])    
+        return tuple([bool(touched >> i & 0x01) for i in range(8)])
 
     def touched(self):
         """Return 8 bit value representing touch state of all pins."""
@@ -142,13 +142,14 @@ class CAP1188:
         """Perform a self recalibration on all the pins."""
         self._recalibrate_pins(0xFF)
 
-    def _delta_count(self, pin):
+    def delta_count(self, pin):
         """Return the 8 bit delta count value for the channel."""
         if pin < 1 or pin > 8:
-            raise IndexError('Pin must be a value 1-8.') 
+            raise IndexError('Pin must be a value 1-8.')
         return self._read_register(CAP1188_DELTA_COUNT[pin-1])
 
-    def _recalibrate_pins(self, mask):
+    def recalibrate_pins(self, mask):
+        """Recalibrate pins specified by bit mask."""
         self._write_register(CAP1188_CAL_ACTIVATE, mask)
 
     def _read_register(self, address):
