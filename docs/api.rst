@@ -4,5 +4,11 @@
 .. If your library file(s) are nested in a directory (e.g. /adafruit_foo/foo.py)
 .. use this format as the module name: "adafruit_foo.foo"
 
-.. automodule:: adafruit_cap1188
+.. automodule:: adafruit_cap1188.cap1188
+   :members:
+
+.. automodule:: adafruit_cap1188.i2c
+   :members:
+
+.. automodule:: adafruit_cap1188.spi
    :members:
