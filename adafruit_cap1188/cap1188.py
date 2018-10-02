@@ -140,7 +140,7 @@ class CAP1188:
 
     def recalibrate(self):
         """Perform a self recalibration on all the pins."""
-        self._recalibrate_pins(0xFF)
+        self.recalibrate_pins(0xFF)
 
     def delta_count(self, pin):
         """Return the 8 bit delta count value for the channel."""

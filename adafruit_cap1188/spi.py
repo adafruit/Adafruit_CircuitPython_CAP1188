@@ -68,7 +68,7 @@ class CAP1188_SPI(CAP1188):
         self._buf[1] = address
         self._buf[2] = CAP1188_SPI_READ_DATA
         with self._spi as spi:
-            spi.write_readinto(self._buf, self._buf)
+            spi.write_readinto(self._buf, self._buf) # pylint: disable=no-member
         return self._buf[3]
 
     def _write_register(self, address, value):
@@ -78,4 +78,4 @@ class CAP1188_SPI(CAP1188):
         self._buf[2] = CAP1188_SPI_WRITE_DATA
         self._buf[3] = value
         with self._spi as spi:
-            spi.write(self._buf)
+            spi.write(self._buf) # pylint: disable=no-member
