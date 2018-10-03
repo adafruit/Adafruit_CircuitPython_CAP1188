@@ -48,6 +48,8 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
 
 # pylint: disable=bad-whitespace
+CAP1188_MID                 = const(0x5D)
+CAP1188_PID                 = const(0x50)
 CAP1188_MAIN_CONTROL        = const(0x00)
 CAP1188_GENERAL_STATUS      = const(0x02)
 CAP1188_INPUT_STATUS        = const(0x03)
@@ -95,6 +97,12 @@ class CAP1188_Channel:
 class CAP1188:
     """CAP1188 driver base, must be extended for I2C/SPI interfacing."""
     def __init__(self):
+        mid = self._read_register(CAP1188_MANU_ID) 
+        if mid != CAP1188_MID:
+            raise RuntimeError('Failed to find CAP1188! Manufacturer ID: 0x{:02x}'.format(mid))
+        pid = self._read_register(CAP1188_PRODUCT_ID) 
+        if pid != CAP1188_PID:
+            raise RuntimeError('Failed to find CAP1188! Product ID: 0x{:02x}'.format(pid))
         self._channels = [None]*8
         self._write_register(CAP1188_LED_LINKING, 0xFF)     # turn on LED linking
         self._write_register(CAP1188_MULTI_TOUCH_CFG, 0x00) # allow multi touch
@@ -108,21 +116,6 @@ class CAP1188:
         if self._channels[index] is None:
             self._channels[index] = CAP1188_Channel(self, pin)
         return self._channels[index]
-
-    @property
-    def product_id(self):
-        """The product ID."""
-        return self._read_register(CAP1188_PRODUCT_ID)
-
-    @property
-    def manufacturer_id(self):
-        """The manufacturer ID."""
-        return self._read_register(CAP1188_MANU_ID)
-
-    @property
-    def revision(self):
-        """The revision number."""
-        return self._read_register(CAP1188_REVISION)
 
     @property
     def touched_pins(self):
@@ -146,7 +139,10 @@ class CAP1188:
         """Return the 8 bit delta count value for the channel."""
         if pin < 1 or pin > 8:
             raise IndexError('Pin must be a value 1-8.')
-        return self._read_register(CAP1188_DELTA_COUNT[pin-1])
+        # 8 bit 2's complement
+        raw_value = self._read_register(CAP1188_DELTA_COUNT[pin-1])
+        raw_value = raw_value - 256 if raw_value & 128 else raw_value
+        return raw_value
 
     def recalibrate_pins(self, mask):
         """Recalibrate pins specified by bit mask."""
