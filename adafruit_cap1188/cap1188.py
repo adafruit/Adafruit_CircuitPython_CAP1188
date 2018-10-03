@@ -117,12 +117,12 @@ class CAP1188:
     @property
     def manufacturer_id(self):
         """The manufacturer ID."""
-        return self._read_register(CAP1188_REVISION)
+        return self._read_register(CAP1188_MANU_ID)
 
     @property
     def revision(self):
         """The revision number."""
-        return self._read_register(CAP1188_MANU_ID)
+        return self._read_register(CAP1188_REVISION)
 
     @property
     def touched_pins(self):
