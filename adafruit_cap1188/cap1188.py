@@ -97,10 +97,10 @@ class CAP1188_Channel:
 class CAP1188:
     """CAP1188 driver base, must be extended for I2C/SPI interfacing."""
     def __init__(self):
-        mid = self._read_register(CAP1188_MANU_ID) 
+        mid = self._read_register(CAP1188_MANU_ID)
         if mid != CAP1188_MID:
             raise RuntimeError('Failed to find CAP1188! Manufacturer ID: 0x{:02x}'.format(mid))
-        pid = self._read_register(CAP1188_PRODUCT_ID) 
+        pid = self._read_register(CAP1188_PRODUCT_ID)
         if pid != CAP1188_PID:
             raise RuntimeError('Failed to find CAP1188! Product ID: 0x{:02x}'.format(pid))
         self._channels = [None]*8
