@@ -10,7 +10,7 @@ cap = CAP1188_I2C(i2c)
 # from digitalio import DigitalInOut, Direction
 # from adafruit_cap1188.spi import CAP1188_SPI
 # spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-# cs = DigitalInOut(board.D10)
+# cs = DigitalInOut(board.D5)
 # cap = CAP1188_SPI(spi, cs)
 
 while True:
