@@ -77,6 +77,7 @@ CAP1188_REVISION            = const(0xFF)
 _SENSITIVITY = (128, 64, 32, 16, 8, 4, 2, 1)
 
 class CAP1188_Channel:
+    # pylint: disable=protected-access
     """Helper class to represent a touch channel on the CAP1188. Not meant to
     be used directly."""
     def __init__(self, cap1188, pin):
