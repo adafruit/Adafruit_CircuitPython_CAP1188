@@ -74,3 +74,16 @@ class CAP1188_I2C(CAP1188):
         self._buf[1] = value
         with self._i2c as i2c:
             i2c.write(self._buf)
+
+    def _read_block(self, start, length):
+        """Return byte array of values from start address to length."""
+        result = bytearray(length)
+        with self._i2c as i2c:
+            i2c.write(bytes((start,)))
+            i2c.readinto(result)
+        return result
+
+    def _write_block(self, start, data):
+        """Write out data beginning at start address."""
+        with self._i2c as i2c:
+            i2c.write(bytes((start,)) + data)

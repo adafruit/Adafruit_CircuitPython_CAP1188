@@ -63,14 +63,18 @@ CAP1188_DELTA_COUNT         =(const(0x10),
                               const(0x15),
                               const(0x16),
                               const(0x17))
+CAP1188_SENSITIVTY          = const(0x1F)
 CAP1188_CAL_ACTIVATE        = const(0x26)
 CAP1188_MULTI_TOUCH_CFG     = const(0x2A)
+CAP1188_THESHOLD_1          = const(0x30)
 CAP1188_STANDBY_CFG         = const(0x41)
 CAP1188_LED_LINKING         = const(0x72)
 CAP1188_PRODUCT_ID          = const(0xFD)
 CAP1188_MANU_ID             = const(0xFE)
 CAP1188_REVISION            = const(0xFF)
 # pylint: enable=bad-whitespace
+
+_SENSITIVITY = (128, 64, 32, 16, 8, 4, 2, 1)
 
 class CAP1188_Channel:
     """Helper class to represent a touch channel on the CAP1188. Not meant to
@@ -89,6 +93,18 @@ class CAP1188_Channel:
         """The raw touch measurement."""
         return self._cap1188.delta_count(self._pin)
 
+    @property
+    def threshold(self):
+        """The touch threshold value."""
+        return self._cap1188._read_register(CAP1188_THESHOLD_1 + self._pin - 1)
+
+    @threshold.setter
+    def threshold(self, value):
+        value = int(value)
+        if not 0 <= value <= 127:
+            raise ValueError("Threshold value must be in range 0 to 127.")
+        self._cap1188._write_register(CAP1188_THESHOLD_1 + self._pin - 1, value)     
+
     def recalibrate(self):
         """Perform a self recalibration."""
         self._cap1188.recalibrate_pins(1 << self._pin - 1)
@@ -106,6 +122,7 @@ class CAP1188:
         self._channels = [None]*8
         self._write_register(CAP1188_LED_LINKING, 0xFF)     # turn on LED linking
         self._write_register(CAP1188_MULTI_TOUCH_CFG, 0x00) # allow multi touch
+        self._write_register(0x2F, 0x10) # turn off input-1-sets-all-inputs feature
         self.recalibrate()
 
     def __getitem__(self, key):
@@ -131,6 +148,34 @@ class CAP1188:
         # return only currently touched pins
         return self._read_register(CAP1188_INPUT_STATUS)
 
+    @property
+    def sensitivity(self):
+        return _SENSITIVITY[self._read_register(CAP1188_SENSITIVTY) >> 4 & 0x07]
+
+    @sensitivity.setter
+    def sensitivity(self, value):
+        if value not in _SENSITIVITY:
+            raise ValueError("Sensitivty must be one of: {}".format(_SENSITIVITY))
+        value = _SENSITIVITY.index(value) << 4
+        new_setting = self._read_register(CAP1188_SENSITIVTY) & 0x8F | value
+        self._write_register(CAP1188_SENSITIVTY, new_setting)
+
+    @property
+    def thresholds(self):
+        """Touch threshold value for all channels."""
+        return self.threshold_values()
+
+    @thresholds.setter
+    def thresholds(self, value):
+        value = int(value)
+        if not 0 <= value <= 127:
+            raise ValueError("Threshold value must be in range 0 to 127.")
+        self._write_block(CAP1188_THESHOLD_1, bytearray((value,)*8))
+
+    def threshold_values(self):
+        """Return tuple of touch threshold values for all channels."""
+        return tuple(self._read_block(CAP1188_THESHOLD_1, 8))
+
     def recalibrate(self):
         """Perform a self recalibration on all the pins."""
         self.recalibrate_pins(0xFF)
@@ -154,4 +199,12 @@ class CAP1188:
 
     def _write_register(self, address, value):
         """Write 8 bit value to registter at address."""
+        raise NotImplementedError
+
+    def _read_block(self, start, length):
+        """Return byte array of values from start address to length."""
+        raise NotImplementedError
+
+    def _write_block(self, start, data):
+        """Write out data beginning at start address."""
         raise NotImplementedError

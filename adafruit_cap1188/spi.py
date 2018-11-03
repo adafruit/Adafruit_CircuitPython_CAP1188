@@ -79,3 +79,25 @@ class CAP1188_SPI(CAP1188):
         self._buf[3] = value
         with self._spi as spi:
             spi.write(self._buf) # pylint: disable=no-member
+
+    def _read_block(self, start, length):
+        """Return byte array of values from start address to length."""
+        self._buf[0] = CAP1188_SPI_SET_ADDR
+        self._buf[1] = start
+        self._buf[2] = CAP1188_SPI_READ_DATA
+        result = bytearray((CAP1188_SPI_READ_DATA,)*length)
+        with self._spi as spi:
+            spi.write(self._buf, end=3)
+            spi.write_readinto(result, result)
+        return result
+
+    def _write_block(self, start, data):
+        """Write out data beginning at start address."""
+        self._buf[0] = CAP1188_SPI_SET_ADDR
+        self._buf[1] = start
+        with self._spi as spi:
+            spi.write(self._buf, end=2)
+            self._buf[0] = CAP1188_SPI_WRITE_DATA
+            for d in data:
+                self._buf[1] = d
+                spi.write(self._buf, end=2)
