@@ -103,7 +103,7 @@ class CAP1188_Channel:
         value = int(value)
         if not 0 <= value <= 127:
             raise ValueError("Threshold value must be in range 0 to 127.")
-        self._cap1188._write_register(CAP1188_THESHOLD_1 + self._pin - 1, value)     
+        self._cap1188._write_register(CAP1188_THESHOLD_1 + self._pin - 1, value)
 
     def recalibrate(self):
         """Perform a self recalibration."""
@@ -150,6 +150,7 @@ class CAP1188:
 
     @property
     def sensitivity(self):
+        """The sensitvity of touch detections. Range is 1 (least) to 128 (most)."""
         return _SENSITIVITY[self._read_register(CAP1188_SENSITIVTY) >> 4 & 0x07]
 
     @sensitivity.setter

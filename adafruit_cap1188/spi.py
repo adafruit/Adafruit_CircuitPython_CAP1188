@@ -63,24 +63,27 @@ class CAP1188_SPI(CAP1188):
         super().__init__()
 
     def _read_register(self, address):
+        # pylint: disable=no-member
         """Return 8 bit value of register at address."""
         self._buf[0] = CAP1188_SPI_SET_ADDR
         self._buf[1] = address
         self._buf[2] = CAP1188_SPI_READ_DATA
         with self._spi as spi:
-            spi.write_readinto(self._buf, self._buf) # pylint: disable=no-member
+            spi.write_readinto(self._buf, self._buf)
         return self._buf[3]
 
     def _write_register(self, address, value):
+        # pylint: disable=no-member
         """Write 8 bit value to registter at address."""
         self._buf[0] = CAP1188_SPI_SET_ADDR
         self._buf[1] = address
         self._buf[2] = CAP1188_SPI_WRITE_DATA
         self._buf[3] = value
         with self._spi as spi:
-            spi.write(self._buf) # pylint: disable=no-member
+            spi.write(self._buf)
 
     def _read_block(self, start, length):
+        # pylint: disable=no-member
         """Return byte array of values from start address to length."""
         self._buf[0] = CAP1188_SPI_SET_ADDR
         self._buf[1] = start
@@ -92,12 +95,13 @@ class CAP1188_SPI(CAP1188):
         return result
 
     def _write_block(self, start, data):
+        # pylint: disable=no-member
         """Write out data beginning at start address."""
         self._buf[0] = CAP1188_SPI_SET_ADDR
         self._buf[1] = start
         with self._spi as spi:
             spi.write(self._buf, end=2)
             self._buf[0] = CAP1188_SPI_WRITE_DATA
-            for d in data:
-                self._buf[1] = d
+            for value in data:
+                self._buf[1] = value
                 spi.write(self._buf, end=2)
