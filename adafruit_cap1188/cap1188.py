@@ -132,7 +132,7 @@ class CAP1188:
         if pin < 1 or pin > 8:
             raise IndexError('Pin must be a value 1-8.')
         if self._channels[index] is None:
-            self._channels[index] = _CAP1188_Channel(self, pin)
+            self._channels[index] = CAP1188_Channel(self, pin)
         return self._channels[index]
 
     @property
