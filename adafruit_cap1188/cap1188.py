@@ -48,14 +48,14 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
 
 # pylint: disable=bad-whitespace
-CAP1188_MID                 = const(0x5D)
-CAP1188_PID                 = const(0x50)
-CAP1188_MAIN_CONTROL        = const(0x00)
-CAP1188_GENERAL_STATUS      = const(0x02)
-CAP1188_INPUT_STATUS        = const(0x03)
-CAP1188_LED_STATUS          = const(0x04)
-CAP1188_NOISE_FLAGS         = const(0x0A)
-CAP1188_DELTA_COUNT         =(const(0x10),
+_CAP1188_MID                = const(0x5D)
+_CAP1188_PID                = const(0x50)
+_CAP1188_MAIN_CONTROL       = const(0x00)
+_CAP1188_GENERAL_STATUS     = const(0x02)
+_CAP1188_INPUT_STATUS       = const(0x03)
+_CAP1188_LED_STATUS         = const(0x04)
+_CAP1188_NOISE_FLAGS        = const(0x0A)
+_CAP1188_DELTA_COUNT        =(const(0x10),
                               const(0x11),
                               const(0x12),
                               const(0x13),
@@ -63,16 +63,21 @@ CAP1188_DELTA_COUNT         =(const(0x10),
                               const(0x15),
                               const(0x16),
                               const(0x17))
-CAP1188_CAL_ACTIVATE        = const(0x26)
-CAP1188_MULTI_TOUCH_CFG     = const(0x2A)
-CAP1188_STANDBY_CFG         = const(0x41)
-CAP1188_LED_LINKING         = const(0x72)
-CAP1188_PRODUCT_ID          = const(0xFD)
-CAP1188_MANU_ID             = const(0xFE)
-CAP1188_REVISION            = const(0xFF)
+_CAP1188_SENSITIVTY         = const(0x1F)
+_CAP1188_CAL_ACTIVATE       = const(0x26)
+_CAP1188_MULTI_TOUCH_CFG    = const(0x2A)
+_CAP1188_THESHOLD_1         = const(0x30)
+_CAP1188_STANDBY_CFG        = const(0x41)
+_CAP1188_LED_LINKING        = const(0x72)
+_CAP1188_PRODUCT_ID         = const(0xFD)
+_CAP1188_MANU_ID            = const(0xFE)
+_CAP1188_REVISION           = const(0xFF)
 # pylint: enable=bad-whitespace
 
+_SENSITIVITY = (128, 64, 32, 16, 8, 4, 2, 1)
+
 class CAP1188_Channel:
+    # pylint: disable=protected-access
     """Helper class to represent a touch channel on the CAP1188. Not meant to
     be used directly."""
     def __init__(self, cap1188, pin):
@@ -89,6 +94,18 @@ class CAP1188_Channel:
         """The raw touch measurement."""
         return self._cap1188.delta_count(self._pin)
 
+    @property
+    def threshold(self):
+        """The touch threshold value."""
+        return self._cap1188._read_register(_CAP1188_THESHOLD_1 + self._pin - 1)
+
+    @threshold.setter
+    def threshold(self, value):
+        value = int(value)
+        if not 0 <= value <= 127:
+            raise ValueError("Threshold value must be in range 0 to 127.")
+        self._cap1188._write_register(_CAP1188_THESHOLD_1 + self._pin - 1, value)
+
     def recalibrate(self):
         """Perform a self recalibration."""
         self._cap1188.recalibrate_pins(1 << self._pin - 1)
@@ -97,15 +114,16 @@ class CAP1188_Channel:
 class CAP1188:
     """CAP1188 driver base, must be extended for I2C/SPI interfacing."""
     def __init__(self):
-        mid = self._read_register(CAP1188_MANU_ID)
-        if mid != CAP1188_MID:
+        mid = self._read_register(_CAP1188_MANU_ID)
+        if mid != _CAP1188_MID:
             raise RuntimeError('Failed to find CAP1188! Manufacturer ID: 0x{:02x}'.format(mid))
-        pid = self._read_register(CAP1188_PRODUCT_ID)
-        if pid != CAP1188_PID:
+        pid = self._read_register(_CAP1188_PRODUCT_ID)
+        if pid != _CAP1188_PID:
             raise RuntimeError('Failed to find CAP1188! Product ID: 0x{:02x}'.format(pid))
         self._channels = [None]*8
-        self._write_register(CAP1188_LED_LINKING, 0xFF)     # turn on LED linking
-        self._write_register(CAP1188_MULTI_TOUCH_CFG, 0x00) # allow multi touch
+        self._write_register(_CAP1188_LED_LINKING, 0xFF)     # turn on LED linking
+        self._write_register(_CAP1188_MULTI_TOUCH_CFG, 0x00) # allow multi touch
+        self._write_register(0x2F, 0x10) # turn off input-1-sets-all-inputs feature
         self.recalibrate()
 
     def __getitem__(self, key):
@@ -126,10 +144,39 @@ class CAP1188:
     def touched(self):
         """Return 8 bit value representing touch state of all pins."""
         # clear the INT bit and any previously touched pins
-        current = self._read_register(CAP1188_MAIN_CONTROL)
-        self._write_register(CAP1188_MAIN_CONTROL, current & ~0x01)
+        current = self._read_register(_CAP1188_MAIN_CONTROL)
+        self._write_register(_CAP1188_MAIN_CONTROL, current & ~0x01)
         # return only currently touched pins
-        return self._read_register(CAP1188_INPUT_STATUS)
+        return self._read_register(_CAP1188_INPUT_STATUS)
+
+    @property
+    def sensitivity(self):
+        """The sensitvity of touch detections. Range is 1 (least) to 128 (most)."""
+        return _SENSITIVITY[self._read_register(_CAP1188_SENSITIVTY) >> 4 & 0x07]
+
+    @sensitivity.setter
+    def sensitivity(self, value):
+        if value not in _SENSITIVITY:
+            raise ValueError("Sensitivty must be one of: {}".format(_SENSITIVITY))
+        value = _SENSITIVITY.index(value) << 4
+        new_setting = self._read_register(_CAP1188_SENSITIVTY) & 0x8F | value
+        self._write_register(_CAP1188_SENSITIVTY, new_setting)
+
+    @property
+    def thresholds(self):
+        """Touch threshold value for all channels."""
+        return self.threshold_values()
+
+    @thresholds.setter
+    def thresholds(self, value):
+        value = int(value)
+        if not 0 <= value <= 127:
+            raise ValueError("Threshold value must be in range 0 to 127.")
+        self._write_block(_CAP1188_THESHOLD_1, bytearray((value,)*8))
+
+    def threshold_values(self):
+        """Return tuple of touch threshold values for all channels."""
+        return tuple(self._read_block(_CAP1188_THESHOLD_1, 8))
 
     def recalibrate(self):
         """Perform a self recalibration on all the pins."""
@@ -140,13 +187,13 @@ class CAP1188:
         if pin < 1 or pin > 8:
             raise IndexError('Pin must be a value 1-8.')
         # 8 bit 2's complement
-        raw_value = self._read_register(CAP1188_DELTA_COUNT[pin-1])
+        raw_value = self._read_register(_CAP1188_DELTA_COUNT[pin-1])
         raw_value = raw_value - 256 if raw_value & 128 else raw_value
         return raw_value
 
     def recalibrate_pins(self, mask):
         """Recalibrate pins specified by bit mask."""
-        self._write_register(CAP1188_CAL_ACTIVATE, mask)
+        self._write_register(_CAP1188_CAL_ACTIVATE, mask)
 
     def _read_register(self, address):
         """Return 8 bit value of register at address."""
@@ -154,4 +201,12 @@ class CAP1188:
 
     def _write_register(self, address, value):
         """Write 8 bit value to registter at address."""
+        raise NotImplementedError
+
+    def _read_block(self, start, length):
+        """Return byte array of values from start address to length."""
+        raise NotImplementedError
+
+    def _write_block(self, start, data):
+        """Write out data beginning at start address."""
         raise NotImplementedError
