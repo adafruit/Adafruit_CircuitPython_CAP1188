@@ -50,9 +50,9 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
 
 # pylint: disable=bad-whitespace
-CAP1188_SPI_SET_ADDR        = const(0x7D)
-CAP1188_SPI_WRITE_DATA      = const(0x7E)
-CAP1188_SPI_READ_DATA       = const(0x7F)
+_CAP1188_SPI_SET_ADDR        = const(0x7D)
+_CAP1188_SPI_WRITE_DATA      = const(0x7E)
+_CAP1188_SPI_READ_DATA       = const(0x7F)
 # pylint: enable=bad-whitespace
 
 class CAP1188_SPI(CAP1188):
@@ -65,9 +65,9 @@ class CAP1188_SPI(CAP1188):
     def _read_register(self, address):
         # pylint: disable=no-member
         """Return 8 bit value of register at address."""
-        self._buf[0] = CAP1188_SPI_SET_ADDR
+        self._buf[0] = _CAP1188_SPI_SET_ADDR
         self._buf[1] = address
-        self._buf[2] = CAP1188_SPI_READ_DATA
+        self._buf[2] = _CAP1188_SPI_READ_DATA
         with self._spi as spi:
             spi.write_readinto(self._buf, self._buf)
         return self._buf[3]
@@ -75,9 +75,9 @@ class CAP1188_SPI(CAP1188):
     def _write_register(self, address, value):
         # pylint: disable=no-member
         """Write 8 bit value to registter at address."""
-        self._buf[0] = CAP1188_SPI_SET_ADDR
+        self._buf[0] = _CAP1188_SPI_SET_ADDR
         self._buf[1] = address
-        self._buf[2] = CAP1188_SPI_WRITE_DATA
+        self._buf[2] = _CAP1188_SPI_WRITE_DATA
         self._buf[3] = value
         with self._spi as spi:
             spi.write(self._buf)
@@ -85,10 +85,10 @@ class CAP1188_SPI(CAP1188):
     def _read_block(self, start, length):
         # pylint: disable=no-member
         """Return byte array of values from start address to length."""
-        self._buf[0] = CAP1188_SPI_SET_ADDR
+        self._buf[0] = _CAP1188_SPI_SET_ADDR
         self._buf[1] = start
-        self._buf[2] = CAP1188_SPI_READ_DATA
-        result = bytearray((CAP1188_SPI_READ_DATA,)*length)
+        self._buf[2] = _CAP1188_SPI_READ_DATA
+        result = bytearray((_CAP1188_SPI_READ_DATA,)*length)
         with self._spi as spi:
             spi.write(self._buf, end=3)
             spi.write_readinto(result, result)
@@ -97,11 +97,11 @@ class CAP1188_SPI(CAP1188):
     def _write_block(self, start, data):
         # pylint: disable=no-member
         """Write out data beginning at start address."""
-        self._buf[0] = CAP1188_SPI_SET_ADDR
+        self._buf[0] = _CAP1188_SPI_SET_ADDR
         self._buf[1] = start
         with self._spi as spi:
             spi.write(self._buf, end=2)
-            self._buf[0] = CAP1188_SPI_WRITE_DATA
+            self._buf[0] = _CAP1188_SPI_WRITE_DATA
             for value in data:
                 self._buf[1] = value
                 spi.write(self._buf, end=2)

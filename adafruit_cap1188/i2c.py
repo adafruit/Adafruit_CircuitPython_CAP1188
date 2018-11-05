@@ -50,12 +50,12 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
 
 # pylint: disable=bad-whitespace
-CAP1188_DEFAULT_ADDRESS     = const(0x29)
+_CAP1188_DEFAULT_ADDRESS     = const(0x29)
 # pylint: enable=bad-whitespace
 
 class CAP1188_I2C(CAP1188):
     """Driver for the CAP1188 connected over I2C."""
-    def __init__(self, i2c, address=CAP1188_DEFAULT_ADDRESS):
+    def __init__(self, i2c, address=_CAP1188_DEFAULT_ADDRESS):
         self._i2c = i2c_device.I2CDevice(i2c, address)
         self._buf = bytearray(2)
         super().__init__()
