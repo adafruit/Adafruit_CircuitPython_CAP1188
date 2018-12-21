@@ -9,8 +9,8 @@ Introduction
     :target: https://discord.gg/nBQh6qu
     :alt: Discord
 
-.. image:: https://travis-ci.org/adafruit/Adafruit_CircuitPython_CAP1188.svg?branch=master
-    :target: https://travis-ci.org/adafruit/Adafruit_CircuitPython_CAP1188
+.. image:: https://travis-ci.com/adafruit/Adafruit_CircuitPython_CAP1188.svg?branch=master
+    :target: https://travis-ci.com/adafruit/Adafruit_CircuitPython_CAP1188
     :alt: Build Status
 
 CircuitPython driver for the CAP1188 8-Key Capacitive Touch Sensor Breakout. 
