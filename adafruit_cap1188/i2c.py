@@ -64,8 +64,7 @@ class CAP1188_I2C(CAP1188):
         """Return 8 bit value of register at address."""
         self._buf[0] = address
         with self._i2c as i2c:
-            i2c.write(self._buf, end=1, stop=False)
-            i2c.readinto(self._buf, start=1)
+            i2c.write_then_readinto(self._buf, self._buf, out_end=1, in_start=1)
         return self._buf[1]
 
     def _write_register(self, address, value):
