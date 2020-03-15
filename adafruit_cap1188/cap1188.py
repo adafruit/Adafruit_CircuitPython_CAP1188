@@ -48,38 +48,42 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
 
 # pylint: disable=bad-whitespace
-_CAP1188_MID                = const(0x5D)
-_CAP1188_PID                = const(0x50)
-_CAP1188_MAIN_CONTROL       = const(0x00)
-_CAP1188_GENERAL_STATUS     = const(0x02)
-_CAP1188_INPUT_STATUS       = const(0x03)
-_CAP1188_LED_STATUS         = const(0x04)
-_CAP1188_NOISE_FLAGS        = const(0x0A)
-_CAP1188_DELTA_COUNT        =(const(0x10),
-                              const(0x11),
-                              const(0x12),
-                              const(0x13),
-                              const(0x14),
-                              const(0x15),
-                              const(0x16),
-                              const(0x17))
-_CAP1188_SENSITIVTY         = const(0x1F)
-_CAP1188_CAL_ACTIVATE       = const(0x26)
-_CAP1188_MULTI_TOUCH_CFG    = const(0x2A)
-_CAP1188_THESHOLD_1         = const(0x30)
-_CAP1188_STANDBY_CFG        = const(0x41)
-_CAP1188_LED_LINKING        = const(0x72)
-_CAP1188_PRODUCT_ID         = const(0xFD)
-_CAP1188_MANU_ID            = const(0xFE)
-_CAP1188_REVISION           = const(0xFF)
+_CAP1188_MID = const(0x5D)
+_CAP1188_PID = const(0x50)
+_CAP1188_MAIN_CONTROL = const(0x00)
+_CAP1188_GENERAL_STATUS = const(0x02)
+_CAP1188_INPUT_STATUS = const(0x03)
+_CAP1188_LED_STATUS = const(0x04)
+_CAP1188_NOISE_FLAGS = const(0x0A)
+_CAP1188_DELTA_COUNT = (
+    const(0x10),
+    const(0x11),
+    const(0x12),
+    const(0x13),
+    const(0x14),
+    const(0x15),
+    const(0x16),
+    const(0x17),
+)
+_CAP1188_SENSITIVTY = const(0x1F)
+_CAP1188_CAL_ACTIVATE = const(0x26)
+_CAP1188_MULTI_TOUCH_CFG = const(0x2A)
+_CAP1188_THESHOLD_1 = const(0x30)
+_CAP1188_STANDBY_CFG = const(0x41)
+_CAP1188_LED_LINKING = const(0x72)
+_CAP1188_PRODUCT_ID = const(0xFD)
+_CAP1188_MANU_ID = const(0xFE)
+_CAP1188_REVISION = const(0xFF)
 # pylint: enable=bad-whitespace
 
 _SENSITIVITY = (128, 64, 32, 16, 8, 4, 2, 1)
+
 
 class CAP1188_Channel:
     # pylint: disable=protected-access
     """Helper class to represent a touch channel on the CAP1188. Not meant to
     be used directly."""
+
     def __init__(self, cap1188, pin):
         self._cap1188 = cap1188
         self._pin = pin
@@ -113,24 +117,29 @@ class CAP1188_Channel:
 
 class CAP1188:
     """CAP1188 driver base, must be extended for I2C/SPI interfacing."""
+
     def __init__(self):
         mid = self._read_register(_CAP1188_MANU_ID)
         if mid != _CAP1188_MID:
-            raise RuntimeError('Failed to find CAP1188! Manufacturer ID: 0x{:02x}'.format(mid))
+            raise RuntimeError(
+                "Failed to find CAP1188! Manufacturer ID: 0x{:02x}".format(mid)
+            )
         pid = self._read_register(_CAP1188_PRODUCT_ID)
         if pid != _CAP1188_PID:
-            raise RuntimeError('Failed to find CAP1188! Product ID: 0x{:02x}'.format(pid))
-        self._channels = [None]*8
-        self._write_register(_CAP1188_LED_LINKING, 0xFF)     # turn on LED linking
-        self._write_register(_CAP1188_MULTI_TOUCH_CFG, 0x00) # allow multi touch
-        self._write_register(0x2F, 0x10) # turn off input-1-sets-all-inputs feature
+            raise RuntimeError(
+                "Failed to find CAP1188! Product ID: 0x{:02x}".format(pid)
+            )
+        self._channels = [None] * 8
+        self._write_register(_CAP1188_LED_LINKING, 0xFF)  # turn on LED linking
+        self._write_register(_CAP1188_MULTI_TOUCH_CFG, 0x00)  # allow multi touch
+        self._write_register(0x2F, 0x10)  # turn off input-1-sets-all-inputs feature
         self.recalibrate()
 
     def __getitem__(self, key):
         pin = key
         index = key - 1
         if pin < 1 or pin > 8:
-            raise IndexError('Pin must be a value 1-8.')
+            raise IndexError("Pin must be a value 1-8.")
         if self._channels[index] is None:
             self._channels[index] = CAP1188_Channel(self, pin)
         return self._channels[index]
@@ -172,7 +181,7 @@ class CAP1188:
         value = int(value)
         if not 0 <= value <= 127:
             raise ValueError("Threshold value must be in range 0 to 127.")
-        self._write_block(_CAP1188_THESHOLD_1, bytearray((value,)*8))
+        self._write_block(_CAP1188_THESHOLD_1, bytearray((value,) * 8))
 
     def threshold_values(self):
         """Return tuple of touch threshold values for all channels."""
@@ -185,9 +194,9 @@ class CAP1188:
     def delta_count(self, pin):
         """Return the 8 bit delta count value for the channel."""
         if pin < 1 or pin > 8:
-            raise IndexError('Pin must be a value 1-8.')
+            raise IndexError("Pin must be a value 1-8.")
         # 8 bit 2's complement
-        raw_value = self._read_register(_CAP1188_DELTA_COUNT[pin-1])
+        raw_value = self._read_register(_CAP1188_DELTA_COUNT[pin - 1])
         raw_value = raw_value - 256 if raw_value & 128 else raw_value
         return raw_value
 
