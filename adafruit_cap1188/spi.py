@@ -50,13 +50,15 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
 
 # pylint: disable=bad-whitespace
-_CAP1188_SPI_SET_ADDR        = const(0x7D)
-_CAP1188_SPI_WRITE_DATA      = const(0x7E)
-_CAP1188_SPI_READ_DATA       = const(0x7F)
+_CAP1188_SPI_SET_ADDR = const(0x7D)
+_CAP1188_SPI_WRITE_DATA = const(0x7E)
+_CAP1188_SPI_READ_DATA = const(0x7F)
 # pylint: enable=bad-whitespace
+
 
 class CAP1188_SPI(CAP1188):
     """Driver for the CAP1188 connected over SPI."""
+
     def __init__(self, spi, cs):
         self._spi = spi_device.SPIDevice(spi, cs)
         self._buf = bytearray(4)
@@ -88,7 +90,7 @@ class CAP1188_SPI(CAP1188):
         self._buf[0] = _CAP1188_SPI_SET_ADDR
         self._buf[1] = start
         self._buf[2] = _CAP1188_SPI_READ_DATA
-        result = bytearray((_CAP1188_SPI_READ_DATA,)*length)
+        result = bytearray((_CAP1188_SPI_READ_DATA,) * length)
         with self._spi as spi:
             spi.write(self._buf, end=3)
             spi.write_readinto(result, result)
