@@ -66,6 +66,7 @@ _CAP1188_DELTA_COUNT = (
     const(0x17),
 )
 _CAP1188_SENSITIVTY = const(0x1F)
+_CAP1188_AVERAGING = const(0x24)
 _CAP1188_CAL_ACTIVATE = const(0x26)
 _CAP1188_MULTI_TOUCH_CFG = const(0x2A)
 _CAP1188_THESHOLD_1 = const(0x30)
@@ -77,7 +78,9 @@ _CAP1188_REVISION = const(0xFF)
 # pylint: enable=bad-whitespace
 
 _SENSITIVITY = (128, 64, 32, 16, 8, 4, 2, 1)
-
+_AVG = (1, 2, 4, 8, 16, 32, 64, 128)
+_SAMP_TIME = ("320us", "640us", "1.28ms", "2.56ms")
+_CYCLE_TIME = ("35ms", "70ms", "105ms", "140ms")
 
 class CAP1188_Channel:
     # pylint: disable=protected-access
@@ -170,6 +173,29 @@ class CAP1188:
         value = _SENSITIVITY.index(value) << 4
         new_setting = self._read_register(_CAP1188_SENSITIVTY) & 0x8F | value
         self._write_register(_CAP1188_SENSITIVTY, new_setting)
+
+    @property
+    def averaging(self):
+        """Triple containing the number of samples taken for each channel,
+        the sample time, and the cycle time."""
+        register = self._read_register(_CAP1188_AVERAGING)
+        avg = _AVG[register >> 4 & 0x07]
+        samp_time = _SAMP_TIME[register >> 2 & 0x03]
+        cycle_time = _CYCLE_TIME[register & 0x03]
+        return (avg, samp_time, cycle_time)
+
+    @averaging.setter
+    def averaging(self, value):
+        if value[0] not in _AVG:
+            raise ValueError("Avg must be one of: {}".format(_AVG))
+        if value[1] not in _SAMP_TIME:
+            raise ValueError("Sample Time must be one of: {}".format(_SAMP_TIME))
+        if value[2] not in _CYCLE_TIME:
+            raise ValueError("Cycle Time must be one of: {}".format(_CYCLE_TIME))
+        avg = _AVG.index(value[0]) << 4
+        samp_time = _SAMP_TIME.index(value[1]) << 2
+        cycle_time = _CYCLE_TIME.index(value[2])
+        self._write_register(_CAP1188_AVERAGING, avg | samp_time | cycle_time)
 
     @property
     def thresholds(self):
