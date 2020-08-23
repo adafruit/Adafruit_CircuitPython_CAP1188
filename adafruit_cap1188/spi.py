@@ -49,11 +49,9 @@ from adafruit_cap1188.cap1188 import CAP1188
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
 
-# pylint: disable=bad-whitespace
 _CAP1188_SPI_SET_ADDR = const(0x7D)
 _CAP1188_SPI_WRITE_DATA = const(0x7E)
 _CAP1188_SPI_READ_DATA = const(0x7F)
-# pylint: enable=bad-whitespace
 
 
 class CAP1188_SPI(CAP1188):

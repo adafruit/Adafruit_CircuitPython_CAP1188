@@ -47,7 +47,6 @@ from micropython import const
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
 
-# pylint: disable=bad-whitespace
 _CAP1188_MID = const(0x5D)
 _CAP1188_PID = const(0x50)
 _CAP1188_MAIN_CONTROL = const(0x00)
@@ -74,7 +73,6 @@ _CAP1188_LED_LINKING = const(0x72)
 _CAP1188_PRODUCT_ID = const(0xFD)
 _CAP1188_MANU_ID = const(0xFE)
 _CAP1188_REVISION = const(0xFF)
-# pylint: enable=bad-whitespace
 
 _SENSITIVITY = (128, 64, 32, 16, 8, 4, 2, 1)
 
