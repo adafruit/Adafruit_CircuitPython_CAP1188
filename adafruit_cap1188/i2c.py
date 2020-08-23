@@ -49,9 +49,7 @@ from adafruit_cap1188.cap1188 import CAP1188
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
 
-# pylint: disable=bad-whitespace
 _CAP1188_DEFAULT_ADDRESS = const(0x29)
-# pylint: enable=bad-whitespace
 
 
 class CAP1188_I2C(CAP1188):
