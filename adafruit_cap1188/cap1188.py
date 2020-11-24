@@ -82,6 +82,7 @@ _AVG = (1, 2, 4, 8, 16, 32, 64, 128)
 _SAMP_TIME = ("320us", "640us", "1.28ms", "2.56ms")
 _CYCLE_TIME = ("35ms", "70ms", "105ms", "140ms")
 
+
 class CAP1188_Channel:
     # pylint: disable=protected-access
     """Helper class to represent a touch channel on the CAP1188. Not meant to
