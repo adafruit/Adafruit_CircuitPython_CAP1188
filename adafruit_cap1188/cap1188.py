@@ -129,7 +129,7 @@ class CAP1188:
     def touched_pins(self):
         """A tuple of touched state for all pins."""
         touched = self.touched()
-        return tuple([bool(touched >> i & 0x01) for i in range(8)])
+        return tuple(bool(touched >> i & 1) for i in range(8))
 
     def touched(self):
         """Return 8 bit value representing touch state of all pins."""
