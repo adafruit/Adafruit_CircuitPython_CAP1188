@@ -1,5 +1,4 @@
 # SPDX-FileCopyrightText: 2018 Carter Nelson for Adafruit Industries
-#
 # SPDX-License-Identifier: MIT
 
 """
@@ -8,27 +7,31 @@
 
 CircuitPython driver for the CAP1188 8-Key Capacitive Touch Sensor Breakout.
 
-* Author(s): Carter Nelson
+* Author(s): Carter Nelson, Jeremiah Rose, Jose David M.
 
 Implementation Notes
 --------------------
 
 **Hardware:**
 
-* `CAP1188 - 8-Key Capacitive Touch Sensor Breakout <https://www.adafruit.com/product/1602>`_
+* `CAP1188 - 8-Key Capacitive Touch Sensor Breakout
+  <https://www.adafruit.com/product/1602>`_  (Product ID: 1602)
 
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
-  https://github.com/adafruit/circuitpython/releases
+  https://circuitpython.org/downloads
 
-* Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
+* Adafruit's Bus Device library:
+  https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
+
 """
 
 from micropython import const
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
+
 
 _CAP1188_MID = const(0x5D)
 _CAP1188_PID = const(0x50)
@@ -48,6 +51,7 @@ _CAP1188_DELTA_COUNT = (
     const(0x17),
 )
 _CAP1188_SENSITIVTY = const(0x1F)
+_CAP1188_AVERAGING = const(0x24)
 _CAP1188_CAL_ACTIVATE = const(0x26)
 _CAP1188_MULTI_TOUCH_CFG = const(0x2A)
 _CAP1188_THESHOLD_1 = const(0x30)
@@ -57,7 +61,11 @@ _CAP1188_PRODUCT_ID = const(0xFD)
 _CAP1188_MANU_ID = const(0xFE)
 _CAP1188_REVISION = const(0xFF)
 
+
 _SENSITIVITY = (128, 64, 32, 16, 8, 4, 2, 1)
+_AVG = (1, 2, 4, 8, 16, 32, 64, 128)
+_SAMP_TIME = ("320us", "640us", "1.28ms", "2.56ms")
+_CYCLE_TIME = ("35ms", "70ms", "105ms", "140ms")
 
 
 class CAP1188_Channel:
@@ -129,7 +137,8 @@ class CAP1188:
     def touched_pins(self):
         """A tuple of touched state for all pins."""
         touched = self.touched()
-        return tuple(bool(touched >> i & 1) for i in range(8))
+        # pylint: disable=consider-using-generator
+        return tuple([bool(touched >> i & 0x01) for i in range(8)])
 
     def touched(self):
         """Return 8 bit value representing touch state of all pins."""
@@ -151,6 +160,78 @@ class CAP1188:
         value = _SENSITIVITY.index(value) << 4
         new_setting = self._read_register(_CAP1188_SENSITIVTY) & 0x8F | value
         self._write_register(_CAP1188_SENSITIVTY, new_setting)
+
+    @property
+    def averaging(self):
+        """Samples that are taken for all active channels during the
+        sensor cycle. All samples are taken consecutively on
+        the same channel before the next channel is sampled
+        and the result is averaged over the number of samples measured
+        before  updating the measured results
+
+        if CS1, CS2, and CS3 are sampled during the sensor cycle,
+        and the AVG[2:0] bits are set to take 4 samples per channel,
+        then the full sensor cycle will be:
+        CS1, CS1, CS1, CS1, CS2, CS2, CS2, CS2, CS3, CS3, CS3, CS3.
+        """
+
+        register = self._read_register(_CAP1188_AVERAGING)
+
+        return _AVG[register >> 4 & 0x07]
+
+    @averaging.setter
+    def averaging(self, value):
+        if value not in _AVG:
+            raise ValueError("Avg must be one of: {}".format(_AVG))
+        register = self._read_register(_CAP1188_AVERAGING)
+        avg = _AVG.index(value)
+        avg_value = register | avg << 4
+        self._write_register(_CAP1188_AVERAGING, avg_value)
+
+    @property
+    def sample(self):
+        """Determines the overall cycle time for all  measured  channels
+        during normal operation. All measured channels are sampled at the
+        beginning of the cycle time. If additional time is remaining, then
+        the  device is placed into a lower power state for the remaining
+        duration of the cycle."""
+
+        register = self._read_register(_CAP1188_AVERAGING)
+
+        return _SAMP_TIME[register >> 2 & 0x03]
+
+    @sample.setter
+    def sample(self, value):
+        if value not in _SAMP_TIME:
+            raise ValueError("Sample Time must be one of: {}".format(_SAMP_TIME))
+        register = self._read_register(_CAP1188_AVERAGING)
+        samp_time = _SAMP_TIME.index(value)
+        sample_value = register | samp_time << 2
+        self._write_register(_CAP1188_AVERAGING, sample_value)
+
+    @property
+    def cycle(self):
+        """The programmed cycle time is only maintained if
+        the total averaging time for all samples is less
+        than the programmed cycle. The AVG[2:0] bits will
+        take priority so that if more samples are required
+        than  would normally be allowed during the cycle
+        time, the cycle time will be extended as necessary
+        to accommodate the number of samples to be measured.
+        """
+
+        register = self._read_register(_CAP1188_AVERAGING)
+
+        return _CYCLE_TIME[register & 0x03]
+
+    @cycle.setter
+    def cycle(self, value):
+        if value not in _CYCLE_TIME:
+            raise ValueError("Cycle Time must be one of: {}".format(_CYCLE_TIME))
+        register = self._read_register(_CAP1188_AVERAGING)
+        cycle_time = _CYCLE_TIME.index(value)
+        cycle_value = register | cycle_time
+        self._write_register(_CAP1188_AVERAGING, cycle_value)
 
     @property
     def thresholds(self):
