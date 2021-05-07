@@ -137,8 +137,7 @@ class CAP1188:
     def touched_pins(self):
         """A tuple of touched state for all pins."""
         touched = self.touched()
-        # pylint: disable=consider-using-generator
-        return tuple([bool(touched >> i & 0x01) for i in range(8)])
+        return tuple(bool(touched >> i & 1) for i in range(8))
 
     def touched(self):
         """Return 8 bit value representing touch state of all pins."""
@@ -184,6 +183,7 @@ class CAP1188:
         if value not in _AVG:
             raise ValueError("Avg must be one of: {}".format(_AVG))
         register = self._read_register(_CAP1188_AVERAGING)
+        register = register & 0x8F
         avg = _AVG.index(value)
         avg_value = register | avg << 4
         self._write_register(_CAP1188_AVERAGING, avg_value)
@@ -205,6 +205,7 @@ class CAP1188:
         if value not in _SAMP_TIME:
             raise ValueError("Sample Time must be one of: {}".format(_SAMP_TIME))
         register = self._read_register(_CAP1188_AVERAGING)
+        register = register & 0xF3
         samp_time = _SAMP_TIME.index(value)
         sample_value = register | samp_time << 2
         self._write_register(_CAP1188_AVERAGING, sample_value)
@@ -229,6 +230,7 @@ class CAP1188:
         if value not in _CYCLE_TIME:
             raise ValueError("Cycle Time must be one of: {}".format(_CYCLE_TIME))
         register = self._read_register(_CAP1188_AVERAGING)
+        register = register & 0xFC
         cycle_time = _CYCLE_TIME.index(value)
         cycle_value = register | cycle_time
         self._write_register(_CAP1188_AVERAGING, cycle_value)
@@ -271,7 +273,7 @@ class CAP1188:
         raise NotImplementedError
 
     def _write_register(self, address, value):
-        """Write 8 bit value to registter at address."""
+        """Write 8 bit value to register at address."""
         raise NotImplementedError
 
     def _read_block(self, start, length):
