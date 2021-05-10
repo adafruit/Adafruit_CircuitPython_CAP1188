@@ -15,14 +15,17 @@ Implementation Notes
 
 **Hardware:**
 
-* `CAP1188 - 8-Key Capacitive Touch Sensor Breakout <https://www.adafruit.com/product/1602>`_
+* `CAP1188 - 8-Key Capacitive Touch Sensor Breakout
+  <https://www.adafruit.com/product/1602>`_ (Product ID: 1602)
 
 **Software and Dependencies:**
 
 * Adafruit CircuitPython firmware for the supported boards:
-  https://github.com/adafruit/circuitpython/releases
+  https://circuitpython.org/downloads
 
-* Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
+* Adafruit's Bus Device library:
+  https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
+
 """
 
 import adafruit_bus_device.i2c_device as i2c_device
