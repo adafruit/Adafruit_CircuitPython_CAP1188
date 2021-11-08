@@ -28,7 +28,7 @@ Implementation Notes
 
 """
 
-import adafruit_bus_device.spi_device as spi_device
+from adafruit_bus_device import spi_device
 from micropython import const
 from adafruit_cap1188.cap1188 import CAP1188
 
