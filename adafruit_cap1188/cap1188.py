@@ -129,7 +129,7 @@ class CAP1188:
         self._write_register(0x2F, 0x10)  # turn off input-1-sets-all-inputs feature
         self.recalibrate()
 
-    def __getitem__(self, key: int) -> Cap1188_Channel:
+    def __getitem__(self, key: int) -> CAP1188_Channel:
         pin = key
         index = key - 1
         if pin < 1 or pin > 8:

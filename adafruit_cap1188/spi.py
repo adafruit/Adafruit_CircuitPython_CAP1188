@@ -46,6 +46,7 @@ try:
 except ImportError:
     pass
 
+
 class CAP1188_SPI(CAP1188):
     """Driver for the CAP1188 connected over SPI."""
 

@@ -47,7 +47,7 @@ _CAP1188_DEFAULT_ADDRESS = const(0x29)
 class CAP1188_I2C(CAP1188):
     """Driver for the CAP1188 connected over I2C."""
 
-    def __init__(self, i2c: I2C, address: int =_CAP1188_DEFAULT_ADDRESS) -> None:
+    def __init__(self, i2c: I2C, address: int = _CAP1188_DEFAULT_ADDRESS) -> None:
         self._i2c = i2c_device.I2CDevice(i2c, address)
         self._buf = bytearray(2)
         super().__init__()
