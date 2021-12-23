@@ -13,6 +13,6 @@ Advance test
 This example show the new feature included in the library allowing the possibilite the
 configure the averaging, cycle and sample. For reference please see Sensor Datasheet.
 
-.. literalinclude:: ../examples/cap118_advancedtest.py
-    :caption: examples/cap118_advancedtest.py
+.. literalinclude:: ../examples/cap1188_advancedtest.py
+    :caption: examples/cap1188_advancedtest.py
     :linenos:
