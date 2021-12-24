@@ -39,16 +39,23 @@ _CAP1188_SPI_SET_ADDR = const(0x7D)
 _CAP1188_SPI_WRITE_DATA = const(0x7E)
 _CAP1188_SPI_READ_DATA = const(0x7F)
 
+try:
+    from typing import Union
+    from busio import SPI
+    from digitalio import DigitalInOut
+except ImportError:
+    pass
+
 
 class CAP1188_SPI(CAP1188):
     """Driver for the CAP1188 connected over SPI."""
 
-    def __init__(self, spi, cs):
+    def __init__(self, spi: SPI, cs: DigitalInOut) -> None:
         self._spi = spi_device.SPIDevice(spi, cs)
         self._buf = bytearray(4)
         super().__init__()
 
-    def _read_register(self, address):
+    def _read_register(self, address: int) -> int:
         # pylint: disable=no-member
         """Return 8 bit value of register at address."""
         self._buf[0] = _CAP1188_SPI_SET_ADDR
@@ -58,7 +65,7 @@ class CAP1188_SPI(CAP1188):
             spi.write_readinto(self._buf, self._buf)
         return self._buf[3]
 
-    def _write_register(self, address, value):
+    def _write_register(self, address: int, value: int) -> None:
         # pylint: disable=no-member
         """Write 8 bit value to registter at address."""
         self._buf[0] = _CAP1188_SPI_SET_ADDR
@@ -68,7 +75,7 @@ class CAP1188_SPI(CAP1188):
         with self._spi as spi:
             spi.write(self._buf)
 
-    def _read_block(self, start, length):
+    def _read_block(self, start: int, length: int) -> bytearray:
         # pylint: disable=no-member
         """Return byte array of values from start address to length."""
         self._buf[0] = _CAP1188_SPI_SET_ADDR
@@ -80,7 +87,7 @@ class CAP1188_SPI(CAP1188):
             spi.write_readinto(result, result)
         return result
 
-    def _write_block(self, start, data):
+    def _write_block(self, start: int, data: Union[bytearray, bytes]) -> None:
         # pylint: disable=no-member
         """Write out data beginning at start address."""
         self._buf[0] = _CAP1188_SPI_SET_ADDR
