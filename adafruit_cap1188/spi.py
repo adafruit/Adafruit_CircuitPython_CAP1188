@@ -32,7 +32,7 @@ from adafruit_bus_device import spi_device
 from micropython import const
 from adafruit_cap1188.cap1188 import CAP1188
 
-__version__ = "0.0.0-auto.0"
+__version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_CAP1188.git"
 
 _CAP1188_SPI_SET_ADDR = const(0x7D)
