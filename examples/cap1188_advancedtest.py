@@ -6,7 +6,8 @@
 import board
 from adafruit_cap1188.i2c import CAP1188_I2C
 
-i2c = board.I2C()
+i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 cap = CAP1188_I2C(i2c)
 
 print(f"Sensor Initial Configuration Values: {cap.averaging, cap.sample, cap.cycle}")
