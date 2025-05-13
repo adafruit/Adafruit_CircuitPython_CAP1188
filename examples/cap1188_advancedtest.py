@@ -4,6 +4,7 @@
 # To use in the REPL >>> import cap1188_advancetest
 
 import board
+
 from adafruit_cap1188.i2c import CAP1188_I2C
 
 i2c = board.I2C()  # uses board.SCL and board.SDA

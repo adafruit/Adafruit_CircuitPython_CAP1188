@@ -30,6 +30,7 @@ Implementation Notes
 
 from adafruit_bus_device import spi_device
 from micropython import const
+
 from adafruit_cap1188.cap1188 import CAP1188
 
 __version__ = "0.0.0+auto.0"
@@ -41,6 +42,7 @@ _CAP1188_SPI_READ_DATA = const(0x7F)
 
 try:
     from typing import Union
+
     from busio import SPI
     from digitalio import DigitalInOut
 except ImportError:
@@ -56,7 +58,6 @@ class CAP1188_SPI(CAP1188):
         super().__init__()
 
     def _read_register(self, address: int) -> int:
-        # pylint: disable=no-member
         """Return 8 bit value of register at address."""
         self._buf[0] = _CAP1188_SPI_SET_ADDR
         self._buf[1] = address
@@ -66,7 +67,6 @@ class CAP1188_SPI(CAP1188):
         return self._buf[3]
 
     def _write_register(self, address: int, value: int) -> None:
-        # pylint: disable=no-member
         """Write 8 bit value to registter at address."""
         self._buf[0] = _CAP1188_SPI_SET_ADDR
         self._buf[1] = address
@@ -76,7 +76,6 @@ class CAP1188_SPI(CAP1188):
             spi.write(self._buf)
 
     def _read_block(self, start: int, length: int) -> bytearray:
-        # pylint: disable=no-member
         """Return byte array of values from start address to length."""
         self._buf[0] = _CAP1188_SPI_SET_ADDR
         self._buf[1] = start
@@ -88,7 +87,6 @@ class CAP1188_SPI(CAP1188):
         return result
 
     def _write_block(self, start: int, data: Union[bytearray, bytes]) -> None:
-        # pylint: disable=no-member
         """Write out data beginning at start address."""
         self._buf[0] = _CAP1188_SPI_SET_ADDR
         self._buf[1] = start
