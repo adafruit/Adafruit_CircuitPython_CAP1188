@@ -74,7 +74,6 @@ _CYCLE_TIME = ("35ms", "70ms", "105ms", "140ms")
 
 
 class CAP1188_Channel:
-    # pylint: disable=protected-access
     """Helper class to represent a touch channel on the CAP1188. Not meant to
     be used directly."""
 
@@ -115,14 +114,10 @@ class CAP1188:
     def __init__(self) -> None:
         mid = self._read_register(_CAP1188_MANU_ID)
         if mid != _CAP1188_MID:
-            raise RuntimeError(
-                "Failed to find CAP1188! Manufacturer ID: 0x{:02x}".format(mid)
-            )
+            raise RuntimeError(f"Failed to find CAP1188! Manufacturer ID: 0x{mid:02x}")
         pid = self._read_register(_CAP1188_PRODUCT_ID)
         if pid != _CAP1188_PID:
-            raise RuntimeError(
-                "Failed to find CAP1188! Product ID: 0x{:02x}".format(pid)
-            )
+            raise RuntimeError(f"Failed to find CAP1188! Product ID: 0x{pid:02x}")
         self._channels = [None] * 8
         self._write_register(_CAP1188_LED_LINKING, 0xFF)  # turn on LED linking
         self._write_register(_CAP1188_MULTI_TOUCH_CFG, 0x00)  # allow multi touch
@@ -160,7 +155,7 @@ class CAP1188:
     @sensitivity.setter
     def sensitivity(self, value: int) -> None:
         if value not in _SENSITIVITY:
-            raise ValueError("Sensitivty must be one of: {}".format(_SENSITIVITY))
+            raise ValueError(f"Sensitivty must be one of: {_SENSITIVITY}")
         value = _SENSITIVITY.index(value) << 4
         new_setting = self._read_register(_CAP1188_SENSITIVTY) & 0x8F | value
         self._write_register(_CAP1188_SENSITIVTY, new_setting)
@@ -186,7 +181,7 @@ class CAP1188:
     @averaging.setter
     def averaging(self, value: int) -> None:
         if value not in _AVG:
-            raise ValueError("Avg must be one of: {}".format(_AVG))
+            raise ValueError(f"Avg must be one of: {_AVG}")
         register = self._read_register(_CAP1188_AVERAGING)
         register = register & 0x8F
         avg = _AVG.index(value)
@@ -208,7 +203,7 @@ class CAP1188:
     @sample.setter
     def sample(self, value: str) -> None:
         if value not in _SAMP_TIME:
-            raise ValueError("Sample Time must be one of: {}".format(_SAMP_TIME))
+            raise ValueError(f"Sample Time must be one of: {_SAMP_TIME}")
         register = self._read_register(_CAP1188_AVERAGING)
         register = register & 0xF3
         samp_time = _SAMP_TIME.index(value)
@@ -233,7 +228,7 @@ class CAP1188:
     @cycle.setter
     def cycle(self, value: str) -> None:
         if value not in _CYCLE_TIME:
-            raise ValueError("Cycle Time must be one of: {}".format(_CYCLE_TIME))
+            raise ValueError(f"Cycle Time must be one of: {_CYCLE_TIME}")
         register = self._read_register(_CAP1188_AVERAGING)
         register = register & 0xFC
         cycle_time = _CYCLE_TIME.index(value)

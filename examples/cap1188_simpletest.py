@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import board
+
 from adafruit_cap1188.i2c import CAP1188_I2C
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
@@ -18,4 +19,4 @@ cap = CAP1188_I2C(i2c)
 while True:
     for i in range(1, 9):
         if cap[i].value:
-            print("Pin {} touched!".format(i))
+            print(f"Pin {i} touched!")

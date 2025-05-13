@@ -30,10 +30,12 @@ Implementation Notes
 
 from adafruit_bus_device import i2c_device
 from micropython import const
+
 from adafruit_cap1188.cap1188 import CAP1188
 
 try:
     from typing import Union
+
     from busio import I2C
 except ImportError:
     pass
