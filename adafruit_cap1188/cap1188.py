@@ -183,7 +183,7 @@ class CAP1188:
         if value not in _AVG:
             raise ValueError(f"Avg must be one of: {_AVG}")
         register = self._read_register(_CAP1188_AVERAGING)
-        register = register & 0x8F
+        register &= 0x8F
         avg = _AVG.index(value)
         avg_value = register | avg << 4
         self._write_register(_CAP1188_AVERAGING, avg_value)
@@ -205,7 +205,7 @@ class CAP1188:
         if value not in _SAMP_TIME:
             raise ValueError(f"Sample Time must be one of: {_SAMP_TIME}")
         register = self._read_register(_CAP1188_AVERAGING)
-        register = register & 0xF3
+        register &= 0xF3
         samp_time = _SAMP_TIME.index(value)
         sample_value = register | samp_time << 2
         self._write_register(_CAP1188_AVERAGING, sample_value)
@@ -230,7 +230,7 @@ class CAP1188:
         if value not in _CYCLE_TIME:
             raise ValueError(f"Cycle Time must be one of: {_CYCLE_TIME}")
         register = self._read_register(_CAP1188_AVERAGING)
-        register = register & 0xFC
+        register &= 0xFC
         cycle_time = _CYCLE_TIME.index(value)
         cycle_value = register | cycle_time
         self._write_register(_CAP1188_AVERAGING, cycle_value)
